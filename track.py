@@ -1,10 +1,14 @@
+import csv;
+
 ## welcome screen + prompt admin for # of participants
 in_register = True;
 participant_slots=[];
+csv_slots = [];
 
 def register_tournament(num_participants):
     for i in range(0,int(num_participants)):
         participant_slots.append(None);
+        csv_slots.append(None);
     print("\nGreat! There are %s participant slots ready for sign-ups." % (num_participants));
 
 while in_register == True:
@@ -45,6 +49,7 @@ while in_menu == True:
             user_numstart = input("Desired starting slot #[1-%s]: " % (admin_input));
             if user_numstart.isnumeric() == True and int(user_numstart) > 0 and int(user_numstart) <= int(admin_input) and participant_slots[int(user_numstart)-1]== None:
                 participant_slots[int(user_numstart)-1] = user_name;
+                csv_slots[int(user_numstart)-1] = [user_numstart, user_name];
                 print("\nSuccess:\n%s is signed up in starting slot #%s." % (user_name,user_numstart))
                 #print(participant_slots);
                 valid_numstart = True;
@@ -61,6 +66,7 @@ while in_menu == True:
             user_name = input("Participant Name: ");
             if user_name == participant_slots[int(user_numstart)-1]:
                 participant_slots[int(user_numstart)-1] = None;
+                csv_slots[int(user_numstart)-1] = None;
                 print("\nSuccess:\n%s has been cancelled from starting slot #%s." % (user_name, user_numstart));
                 in_cancel = False;
             else:
@@ -91,7 +97,16 @@ while in_menu == True:
             print("\nSave Changes\n============");
             user_save = input("Save your changes to CSV? [y/n]: ")
             if user_save.lower() == 'y':
-                print("This feature has not yet been configured. Please try again later.")
+                #print("This feature has not yet been configured. Please try again later.")
+                fields = ['Starting Slot', 'Participant name'];
+                for i in range(0,len(csv_slots)):
+                    if csv_slots[i] == None:
+                        csv_slots[i] = [(i + 1),""];
+                rows = csv_slots;
+                with open('tournament_status','w') as f:
+                    write = csv.writer(f);
+                    write.writerow(fields);
+                    write.writerows(rows);
                 in_save = False;
             elif user_save.lower() == 'n':
                 in_save = False;
